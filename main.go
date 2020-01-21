@@ -15,7 +15,16 @@ import (
 
 	"github.com/0xAX/notificator"
 	vlc "github.com/adrg/libvlc-go"
+	"github.com/godbus/dbus/v5"
 	"github.com/gosuri/uilive"
+)
+
+type mediaAction int
+
+const (
+	playPauseMediaAction mediaAction = iota
+	nextMediaAction
+	previousMediaAction
 )
 
 type song struct {
@@ -27,7 +36,59 @@ type song struct {
 	MediaItemId string `json:"MediaItemId"`
 }
 
+var medias = []string{
+	"https://samcloud.spacial.com/api/listen?sid=100903&m=sc&rid=177361",
+	"https://str2b.openstream.co/578?aw_0_1st.collectionid=3127&aw_0_1st.publisherId=602",
+}
+
 func main() {
+	quit := make(chan struct{})
+	actions := make(chan mediaAction)
+	go listenForMediaKeys(actions)
+	go playAudio(actions, quit)
+
+	writer := uilive.New()
+	writer.Start()
+	defer writer.Stop()
+	go pollForMetadataUpdates(writer, quit)
+	<-quit
+}
+
+func listenForMediaKeys(actions chan<- mediaAction) {
+	conn, err := dbus.SessionBus()
+	if err != nil {
+		panic(err)
+	}
+	defer conn.Close()
+
+	obj := conn.Object("org.gnome.SettingsDaemon.MediaKeys", "/org/gnome/SettingsDaemon/MediaKeys")
+	call := obj.Call("org.gnome.SettingsDaemon.MediaKeys.GrabMediaPlayerKeys", 0, "dbus-test", uint32(0))
+	if call.Err != nil {
+		panic(call.Err)
+	}
+
+	if err = conn.AddMatchSignal(
+		dbus.WithMatchObjectPath("/org/gnome/SettingsDaemon/MediaKeys/MediaPlayerKeyPressed"),
+		dbus.WithMatchInterface("org.gnome.SettingsDaemon.MediaKeys"),
+		dbus.WithMatchSender("org.gnome.SettingsDaemon.MediaKeys"),
+	); err != nil {
+		panic(err)
+	}
+
+	c := make(chan *dbus.Signal, 10)
+	conn.Signal(c)
+	for v := range c {
+		if len(v.Body) < 2 {
+			continue
+		}
+
+		if msg, ok := v.Body[1].(string); ok && msg == "Next" {
+			actions <- nextMediaAction
+		}
+	}
+}
+
+func playAudio(actions <-chan mediaAction, quit chan struct{}) {
 	// Initialize libvlc. Additional command line arguments can be passed in
 	// to libvlc by specifying them in the Init function.
 	if err := vlc.Init("--no-video", "--quiet"); err != nil {
@@ -45,22 +106,6 @@ func main() {
 		player.Release()
 	}()
 
-	// Add a media file from path or from URL.
-	// Set player media from path:
-	// media, err := player.LoadMediaFromPath("localpath/test.mp4")
-	// Set player media from URL:
-	media, err := player.LoadMediaFromURL("https://samcloud.spacial.com/api/listen?sid=100903&m=sc&rid=177361")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer media.Release()
-
-	// Start playing the media.
-	err = player.Play()
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	// Retrieve player event manager.
 	manager, err := player.EventManager()
 	if err != nil {
@@ -68,7 +113,6 @@ func main() {
 	}
 
 	// Register the media end reached event with the event manager.
-	quit := make(chan struct{})
 	eventCallback := func(event vlc.Event, userData interface{}) {
 		close(quit)
 	}
@@ -79,15 +123,34 @@ func main() {
 	}
 	defer manager.Detach(eventID)
 
-	writer := uilive.New()
-	writer.Start()
-	defer writer.Stop()
-	go fetchTrackInfo(writer, quit)
+	currentMediaIndex := 0
+	for {
+		media, err := player.LoadMediaFromURL(medias[currentMediaIndex])
+		if err != nil {
+			log.Fatal(err)
+		}
 
-	<-quit
+		// Start playing the media.
+		err = player.Play()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		select {
+		case action := <-actions:
+			switch action {
+			case nextMediaAction:
+				media.Release()
+				currentMediaIndex = (currentMediaIndex + 1) % len(medias)
+			}
+		case <-quit:
+			media.Release()
+			break
+		}
+	}
 }
 
-func fetchTrackInfo(writer io.Writer, quit chan struct{}) {
+func pollForMetadataUpdates(writer io.Writer, quit chan struct{}) {
 	var currentSong song
 	var notify *notificator.Notificator
 	notify = notificator.New(notificator.Options{
