@@ -11,7 +11,9 @@ you want.
 
 ## Installation
 
-Download the latest release and add to your path.
+[Download the latest
+release](https://github.com/codegoalie/disney-stream-player/releases) and add
+to your path.
 
 ```
 $ mv disney-stream-player ~/bin/
