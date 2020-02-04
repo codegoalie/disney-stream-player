@@ -283,7 +283,7 @@ func pollForMetadataUpdates(writer io.Writer, trackInfoFetchers <-chan infoFetch
 	var currentSong trackInfo
 	var notify *notificator.Notificator
 	notify = notificator.New(notificator.Options{
-		DefaultIcon: "icon/micke.png",
+		DefaultIcon: "icon/mickey.png",
 		AppName:     "Stream Player",
 	})
 
