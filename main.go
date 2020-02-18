@@ -158,6 +158,8 @@ var medias = []media{
 			info.Title = splits[1]
 			info.Artist = splits[2]
 			info.Album = splits[0]
+			info.Duration = 0
+			info.StartedAt = time.Time{}
 
 			return nil
 		},
