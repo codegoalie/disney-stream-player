@@ -357,15 +357,19 @@ func pollForMetadataUpdates(writer io.Writer, trackInfoFetchers <-chan infoFetch
 				duration += ")"
 			}
 
-			msg := fmt.Sprintf(
-				"%s - %s [%s]%s\n",
-				currentSong.Title,
-				currentSong.Artist,
-				currentSong.Album,
-				duration,
-			)
+			msg := strings.Builder{}
+			msg.WriteString(currentSong.Title)
+			msg.WriteString(" - ")
+			msg.WriteString(currentSong.Artist)
+			if currentSong.Album != "" {
+				msg.WriteString("[")
+				msg.WriteString(currentSong.Album)
+				msg.WriteString("]")
+			}
+			msg.WriteString(duration)
+			msg.WriteString("\n")
 
-			fmt.Fprintf(writer, msg)
+			fmt.Fprintf(writer, msg.String())
 			notify.Push(
 				currentSong.Title,
 				currentSong.Artist,
