@@ -124,6 +124,15 @@ var medias = []media{
 
 				info.Duration = float64(hours*60*60) + float64(minutes*60) + seconds
 
+				unixStr := strings.Split(strings.Trim(currentSong.DatePlayed, "\\/Date()"), "+")[0]
+				unixMillisecs, err := strconv.ParseInt(unixStr, 10, 64)
+				if err != nil {
+					err = fmt.Errorf("failed to parse Sorcer atmospheres started at: %w", err)
+					return err
+				}
+				startedAt := time.Unix(unixMillisecs/1000, 0)
+				info.StartedAt = startedAt
+
 			}
 			return nil
 		},
