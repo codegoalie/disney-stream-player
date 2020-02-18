@@ -354,33 +354,45 @@ func pollForMetadataUpdates(writer io.Writer, trackInfoFetchers <-chan infoFetch
 			close(quit)
 		}
 
-		if oldTitle != currentSong.Title {
-			duration := ""
-			if currentSong.Duration > 0 {
-				duration += " ("
-				hours := math.Floor(currentSong.Duration / hourInSeconds)
-				if hours > 0 {
-					duration += fmt.Sprintf("%.f", hours) + ":"
-				}
-				minutes := math.Floor(math.Mod(currentSong.Duration, hourInSeconds) / 60)
-				seconds := math.Mod(currentSong.Duration, 60)
-				duration += fmt.Sprintf("%02.f:%02.f", minutes, seconds)
-				duration += ")"
+		duration := ""
+		if currentSong.Duration > 0 {
+			hours := math.Floor(currentSong.Duration / hourInSeconds)
+			if hours > 0 {
+				duration += fmt.Sprintf("%.f", hours) + ":"
 			}
+			minutes := math.Floor(math.Mod(currentSong.Duration, hourInSeconds) / 60)
+			seconds := math.Mod(currentSong.Duration, 60)
+			duration += fmt.Sprintf("%02.f:%02.f", minutes, seconds)
+		}
 
-			msg := strings.Builder{}
-			msg.WriteString(currentSong.Title)
-			msg.WriteString(" - ")
-			msg.WriteString(currentSong.Artist)
-			if currentSong.Album != "" {
-				msg.WriteString("[")
-				msg.WriteString(currentSong.Album)
-				msg.WriteString("]")
+		endsAt := currentSong.StartedAt.Add(time.Second * time.Duration(currentSong.Duration))
+		left := time.Until(endsAt)
+
+		msg := strings.Builder{}
+		msg.WriteString(currentSong.Title)
+		msg.WriteString(" - ")
+		msg.WriteString(currentSong.Artist)
+		if currentSong.Album != "" {
+			msg.WriteString(" [")
+			msg.WriteString(currentSong.Album)
+			msg.WriteString("]")
+		}
+
+		if currentSong.Duration > 0 {
+			msg.WriteString(" (")
+			if left > 0 {
+				msg.WriteString(fmt.Sprintf("%02.f:%02.f", math.Floor(left.Minutes()), math.Mod(left.Seconds(), 60)))
+				msg.WriteString(" / ")
 			}
 			msg.WriteString(duration)
-			msg.WriteString("\n")
+			msg.WriteString(")")
+		}
 
-			fmt.Fprintf(writer, msg.String())
+		msg.WriteString("\n")
+
+		fmt.Fprintf(writer, msg.String())
+
+		if oldTitle != currentSong.Title {
 			notify.Push(
 				currentSong.Title,
 				currentSong.Artist,
