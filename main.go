@@ -52,6 +52,15 @@ type dParkResponse struct {
 	NowPlaying string `json:"nowplaying"`
 }
 
+type wdwnTunesResponse struct {
+	CurrentTrack struct {
+		Title    string  `json:"title"`
+		Artist   string  `json:"artist"`
+		Start    string  `json:"start"`
+		Duration float64 `json:"duration"`
+	} `json:"current-track"`
+}
+
 type infoFetcher struct {
 	infoURL       string
 	unmarshalJSON func([]byte, *trackInfo) error
@@ -140,6 +149,33 @@ var medias = []media{
 			info.Title = splits[1]
 			info.Artist = splits[2]
 			info.Album = splits[0]
+
+			return nil
+		},
+	},
+	{
+		name:      "WDWNTunes",
+		streamURL: "https://streaming.live365.com/a31769",
+		infoURL:   func() string { return "https://api.live365.com/station/a31769" },
+		unmarshalJSON: func(raw []byte, info *trackInfo) error {
+			resp := &wdwnTunesResponse{}
+			err := json.Unmarshal(raw, &resp)
+			if err != nil {
+				err = fmt.Errorf("failed to unmarshal WDWNTunes info: %w", err)
+				return err
+			}
+
+			startedAt, err := time.Parse("2006-01-02 15:04:05.000000-07:00", resp.CurrentTrack.Start)
+			if err != nil {
+				err = fmt.Errorf("failed to parse WDWNTunes started at info: %w", err)
+				return err
+			}
+
+			info.Title = resp.CurrentTrack.Title
+			info.Artist = resp.CurrentTrack.Artist
+			info.Album = ""
+			info.Duration = resp.CurrentTrack.Duration
+			info.StartedAt = startedAt
 
 			return nil
 		},
