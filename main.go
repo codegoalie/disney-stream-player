@@ -166,10 +166,7 @@ func main() {
 		currentMedia = medias[currentMediaIndex]
 		mediaURLs <- currentMedia.streamURL
 		fmt.Fprintf(writer, fmt.Sprintf("Loading %s...\n", currentMedia.name))
-		trackInfoFetchers <- struct {
-			infoURL       string
-			unmarshalJSON func([]byte, *trackInfo) error
-		}{
+		trackInfoFetchers <- infoFetcher{
 			infoURL:       currentMedia.infoURL(),
 			unmarshalJSON: currentMedia.unmarshalJSON,
 		}
