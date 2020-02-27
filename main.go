@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/0xAX/notificator"
 	vlc "github.com/adrg/libvlc-go"
+	"github.com/codegoalie/golibnotify"
 	"github.com/codegoalie/stream-player/dpark"
 	"github.com/codegoalie/stream-player/models"
 	"github.com/codegoalie/stream-player/sorcer"
@@ -177,11 +177,8 @@ func playAudio(nextMediaURL <-chan string, quit chan struct{}) {
 
 func pollForMetadataUpdates(writer io.Writer, trackInfoFetchers <-chan InfoFetcher, quit chan struct{}) {
 	currentSong := &models.TrackInfo{}
-	var notify *notificator.Notificator
-	notify = notificator.New(notificator.Options{
-		DefaultIcon: "icon/mickey.png",
-		AppName:     "Stream Player",
-	})
+	notifier := golibnotify.NewSimpleNotifier("Stream Player")
+	defer notifier.Close()
 
 	trackFetcher := <-trackInfoFetchers
 	for {
@@ -237,11 +234,10 @@ func pollForMetadataUpdates(writer io.Writer, trackInfoFetchers <-chan InfoFetch
 		fmt.Fprintf(writer, msg.String())
 
 		if oldTitle != currentSong.Title {
-			notify.Push(
+			notifier.Update(
 				currentSong.Title,
 				currentSong.Artist,
 				"",
-				notificator.UR_NORMAL,
 			)
 		}
 
