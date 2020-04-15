@@ -9,6 +9,14 @@ you want.
 - [Sorcer Radio Atmospheres](http://srsounds.com/popperSRloops.php)
 - [DPark Radio background music](https://www.dparkradio.com/dparkradioplayerbm.html)
 
+## Prerequisites
+
+### Linux
+
+```
+sudo apt install libvlc-dev vlc libnotify-dev
+```
+
 ## Installation
 
 [Download the latest
