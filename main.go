@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	vlc "github.com/adrg/libvlc-go"
+	vlc "github.com/adrg/libvlc-go/v3"
 	"github.com/codegoalie/golibnotify"
 	"github.com/codegoalie/stream-player/dpark"
 	"github.com/codegoalie/stream-player/models"
@@ -119,14 +119,14 @@ func playAudio(nextMediaURL <-chan string, quit chan struct{}) {
 	// Initialize libvlc. Additional command line arguments can be passed in
 	// to libvlc by specifying them in the Init function.
 	if err := vlc.Init("--no-video", "--quiet"); err != nil {
-		log.Fatal(err)
+		log.Fatal("failed to init vlc", err)
 	}
 	defer vlc.Release()
 
 	// Create a new player.
 	player, err := vlc.NewPlayer()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("failed to create new vlc player: ", err)
 	}
 	defer func() {
 		player.Stop()
@@ -136,7 +136,7 @@ func playAudio(nextMediaURL <-chan string, quit chan struct{}) {
 	// Retrieve player event manager.
 	manager, err := player.EventManager()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("failed to get vlc player event manager", err)
 	}
 
 	// Register the media end reached event with the event manager.
@@ -146,7 +146,7 @@ func playAudio(nextMediaURL <-chan string, quit chan struct{}) {
 
 	eventID, err := manager.Attach(vlc.MediaPlayerEndReached, eventCallback, nil)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("failed to attach to media end reached event", err)
 	}
 	defer manager.Detach(eventID)
 
@@ -160,13 +160,13 @@ func playAudio(nextMediaURL <-chan string, quit chan struct{}) {
 			}
 			media, err = player.LoadMediaFromURL(currentMediaURL)
 			if err != nil {
-				log.Fatal(err)
+				log.Fatal("failed to load media from url", err)
 			}
 
 			// Start playing the media.
 			err = player.Play()
 			if err != nil {
-				log.Fatal(err)
+				log.Fatal("failed to play media", err)
 			}
 		case <-quit:
 			media.Release()
