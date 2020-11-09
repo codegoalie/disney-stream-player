@@ -44,6 +44,7 @@ type MediaSource interface {
 
 var medias = []MediaSource{
 	sorcer.Atmospheres{},
+	sorcer.Seasons{},
 	dpark.Background{},
 	wdwnt.Tunes{},
 }
