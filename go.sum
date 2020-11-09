@@ -1,5 +1,5 @@
-github.com/adrg/libvlc-go/v3 v3.0.2 h1:alyAEcMcSnTEVypCVUnqGO5zQwNeGTSoNSlUL3ST4rk=
-github.com/adrg/libvlc-go/v3 v3.0.2/go.mod h1:xJK0YD8cyMDejnrTFQinStE6RYCV1nlfS8KmqTpszSc=
+github.com/adrg/libvlc-go/v3 v3.0.6 h1:uRjdmHCV64T1o5XF3ZHOcvBOqEiJP5MoqmUgW/Ojvtw=
+github.com/adrg/libvlc-go/v3 v3.0.6/go.mod h1:xJK0YD8cyMDejnrTFQinStE6RYCV1nlfS8KmqTpszSc=
 github.com/codegoalie/golibnotify v0.0.0-20200227220351-6d46577633ac h1:zOINRO/BTSb7w21DFnJ10axkQUOmbMnoI4LoJOS2ec8=
 github.com/codegoalie/golibnotify v0.0.0-20200227220351-6d46577633ac/go.mod h1:+v6J4ss13rISdS08ENaHtBlxYOyIAPXVEUM4KyRYpoY=
 github.com/godbus/dbus/v5 v5.0.3 h1:ZqHaoEF7TBzh4jzPmqVhE/5A1z9of6orkAe5uHoAeME=
