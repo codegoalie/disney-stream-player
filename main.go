@@ -48,6 +48,7 @@ var medias = []MediaSource{
 	dpark.Christmas{},
 	sorcer.Atmospheres{},
 	dpark.Background{},
+	dpark.Resort{},
 	wdwnt.Tunes{},
 }
 
