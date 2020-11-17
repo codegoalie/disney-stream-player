@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -50,6 +51,10 @@ var medias = []MediaSource{
 }
 
 func main() {
+	var currentMediaIndex int
+	flag.IntVar(&currentMediaIndex, "s", 0, "index of stream to start on")
+	flag.Parse()
+
 	quit := make(chan struct{})
 	actions := make(chan mediaAction)
 	mediaURLs := make(chan string)
@@ -62,7 +67,6 @@ func main() {
 	defer writer.Stop()
 	go pollForMetadataUpdates(writer, trackInfoFetchers, quit)
 
-	currentMediaIndex := 0
 	var currentMedia MediaSource
 
 	for {
