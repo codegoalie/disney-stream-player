@@ -9,3 +9,8 @@ type TrackInfo struct {
 	Duration  float64
 	StartedAt time.Time
 }
+
+type InfoFetcher interface {
+	InfoURL() string
+	ParseTrackInfo([]byte) (*TrackInfo, error)
+}

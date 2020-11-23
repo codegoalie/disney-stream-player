@@ -20,30 +20,7 @@ import (
 	"github.com/gosuri/uilive"
 )
 
-type mediaAction int
-
-const (
-	playPauseMediaAction mediaAction = iota
-	nextMediaAction
-	previousMediaAction
-)
-
-const hourInSeconds = 60 * 60
-
-type InfoFetcher interface {
-	InfoURL() string
-	ParseTrackInfo([]byte) (*models.TrackInfo, error)
-}
-
-// MediaSource is a streamable audio source which can fetch its own TrackInfo
-type MediaSource interface {
-	Name() string
-	StreamURL() string
-	InfoURL() string
-	ParseTrackInfo([]byte) (*models.TrackInfo, error)
-}
-
-var medias = []MediaSource{
+var medias = []models.MediaSource{
 	sorcer.Seasons{},
 	dpark.Christmas{},
 	sorcer.Atmospheres{},
@@ -60,16 +37,18 @@ func main() {
 	quit := make(chan struct{})
 	actions := make(chan mediaAction)
 	mediaURLs := make(chan string)
-	trackInfoFetchers := make(chan InfoFetcher)
+
 	go listenForMediaKeys(actions)
 	go playAudio(mediaURLs, quit)
 
 	writer := uilive.New()
 	writer.Start()
 	defer writer.Stop()
+	trackInfoFetchers := make(chan models.InfoFetcher)
+
 	go pollForMetadataUpdates(writer, trackInfoFetchers, quit)
 
-	var currentMedia MediaSource
+	var currentMedia models.MediaSource
 
 	for {
 		currentMedia = medias[currentMediaIndex]
@@ -182,7 +161,7 @@ func playAudio(nextMediaURL <-chan string, quit chan struct{}) {
 	}
 }
 
-func pollForMetadataUpdates(writer io.Writer, trackInfoFetchers <-chan InfoFetcher, quit chan struct{}) {
+func pollForMetadataUpdates(writer io.Writer, trackInfoFetchers <-chan models.InfoFetcher, quit chan struct{}) {
 	currentSong := &models.TrackInfo{}
 	notifier := golibnotify.NewSimpleNotifier("Stream Player")
 	defer notifier.Close()
@@ -218,8 +197,12 @@ func pollForMetadataUpdates(writer io.Writer, trackInfoFetchers <-chan InfoFetch
 
 		msg := strings.Builder{}
 		msg.WriteString(currentSong.Title)
-		msg.WriteString(" - ")
-		msg.WriteString(currentSong.Artist)
+
+		if currentSong.Album != "" {
+			msg.WriteString(" - ")
+			msg.WriteString(currentSong.Artist)
+		}
+
 		if currentSong.Album != "" {
 			msg.WriteString(" [")
 			msg.WriteString(currentSong.Album)
@@ -255,3 +238,13 @@ func pollForMetadataUpdates(writer io.Writer, trackInfoFetchers <-chan InfoFetch
 		}
 	}
 }
+
+type mediaAction int
+
+const (
+	playPauseMediaAction mediaAction = iota
+	nextMediaAction
+	previousMediaAction
+)
+
+const hourInSeconds = 60 * 60

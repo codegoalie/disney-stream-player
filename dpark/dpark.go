@@ -17,7 +17,7 @@ func parseTrackInfo(raw []byte) (*models.TrackInfo, error) {
 	resp := &dParkResponse{}
 	err := json.Unmarshal(raw, &resp)
 	if err != nil {
-		err = fmt.Errorf("failed to unmarshal DPark Radio info: %w", err)
+		err = fmt.Errorf("failed to unmarshal DPark Radio info: %w (%s)", err, string(raw))
 		return nil, err
 	}
 
