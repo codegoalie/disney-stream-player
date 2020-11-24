@@ -198,7 +198,7 @@ func pollForMetadataUpdates(writer io.Writer, trackInfoFetchers <-chan models.In
 		msg := strings.Builder{}
 		msg.WriteString(currentSong.Title)
 
-		if currentSong.Album != "" {
+		if currentSong.Artist != "" {
 			msg.WriteString(" - ")
 			msg.WriteString(currentSong.Artist)
 		}
