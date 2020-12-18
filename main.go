@@ -50,17 +50,23 @@ func main() {
 
 	var currentMedia models.MediaSource
 
+	currentMedia = medias[currentMediaIndex]
+	mediaURLs <- currentMedia.StreamURL()
+	fmt.Fprintf(writer, fmt.Sprintf("Loading %s...\n", currentMedia.Name()))
+	trackInfoFetchers <- currentMedia
 	for {
-		currentMedia = medias[currentMediaIndex]
-		mediaURLs <- currentMedia.StreamURL()
-		fmt.Fprintf(writer, fmt.Sprintf("Loading %s...\n", currentMedia.Name()))
-		trackInfoFetchers <- currentMedia
 		select {
 		case action := <-actions:
 			switch action {
 			case nextMediaAction:
 				currentMediaIndex = (currentMediaIndex + 1) % len(medias)
+				currentMedia = medias[currentMediaIndex]
+				mediaURLs <- currentMedia.StreamURL()
+				fmt.Fprintf(writer, fmt.Sprintf("Loading %s...\n", currentMedia.Name()))
+				trackInfoFetchers <- currentMedia
 			}
+		case <-time.After(time.Second):
+			trackInfoFetchers <- currentMedia
 		case <-quit:
 			return
 		}
@@ -166,19 +172,36 @@ func pollForMetadataUpdates(writer io.Writer, trackInfoFetchers <-chan models.In
 	notifier := golibnotify.NewSimpleNotifier("Stream Player")
 	defer notifier.Close()
 
-	trackFetcher := <-trackInfoFetchers
+	var trackFetcher models.InfoFetcher
+	var msg strings.Builder
+	var oldTitle string
+	lastFetchedAt := time.Time{}
 	for {
-		buf, err := utils.HTTPGet(trackFetcher.InfoURL())
-		if err != nil {
-			fmt.Fprintln(writer, "Error: "+err.Error())
-			close(quit)
-		}
+		trackFetcher = <-trackInfoFetchers
 
-		oldTitle := currentSong.Title
-		currentSong, err = trackFetcher.ParseTrackInfo(buf.Bytes())
-		if err != nil {
-			fmt.Fprintln(writer, "Error: "+err.Error())
-			close(quit)
+		if lastFetchedAt.Before(time.Now().Add(-5 * time.Second)) {
+			lastFetchedAt = time.Now()
+			buf, err := utils.HTTPGet(trackFetcher.InfoURL())
+			if err != nil {
+				fmt.Fprintln(writer, "Error: "+err.Error())
+				close(quit)
+			}
+
+			if len(buf.Bytes()) == 0 {
+				fmt.Fprintf(writer, "Metadata fetch error")
+				time.AfterFunc(time.Second, func() {
+					fmt.Fprintf(writer, msg.String())
+				})
+				continue
+			}
+
+			oldTitle = currentSong.Title
+
+			currentSong, err = trackFetcher.ParseTrackInfo(buf.Bytes())
+			if err != nil {
+				fmt.Fprintln(writer, "Error: "+err.Error())
+				close(quit)
+			}
 		}
 
 		duration := ""
@@ -195,7 +218,6 @@ func pollForMetadataUpdates(writer io.Writer, trackInfoFetchers <-chan models.In
 		endsAt := currentSong.StartedAt.Add(time.Second * time.Duration(currentSong.Duration))
 		left := time.Until(endsAt)
 
-		msg := strings.Builder{}
 		msg.WriteString(currentSong.Title)
 
 		if currentSong.Artist != "" {
@@ -222,6 +244,7 @@ func pollForMetadataUpdates(writer io.Writer, trackInfoFetchers <-chan models.In
 		msg.WriteString("\n")
 
 		fmt.Fprintf(writer, msg.String())
+		msg = strings.Builder{}
 
 		if oldTitle != currentSong.Title {
 			notifier.Update(
@@ -231,11 +254,6 @@ func pollForMetadataUpdates(writer io.Writer, trackInfoFetchers <-chan models.In
 			)
 		}
 
-		select {
-		case trackFetcher = <-trackInfoFetchers:
-		default:
-			time.Sleep(time.Second * 5)
-		}
 	}
 }
 
