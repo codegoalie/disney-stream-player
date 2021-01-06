@@ -21,8 +21,8 @@ import (
 )
 
 var medias = []models.MediaSource{
-	sorcer.Seasons{},
-	dpark.Christmas{},
+	// sorcer.Seasons{},
+	// dpark.Christmas{},
 	sorcer.Atmospheres{},
 	dpark.Background{},
 	dpark.Resort{},
@@ -52,7 +52,8 @@ func main() {
 
 	currentMedia = medias[currentMediaIndex]
 	mediaURLs <- currentMedia.StreamURL()
-	fmt.Fprintf(writer, fmt.Sprintf("Loading %s...\n", currentMedia.Name()))
+	fmt.Fprintf(writer, fmt.Sprintf("Loading %s...", currentMedia.Name()))
+	writer.Flush()
 	trackInfoFetchers <- currentMedia
 	for {
 		select {
@@ -62,7 +63,8 @@ func main() {
 				currentMediaIndex = (currentMediaIndex + 1) % len(medias)
 				currentMedia = medias[currentMediaIndex]
 				mediaURLs <- currentMedia.StreamURL()
-				fmt.Fprintf(writer, fmt.Sprintf("Loading %s...\n", currentMedia.Name()))
+				fmt.Fprintf(writer, fmt.Sprintf("Loading %s...", currentMedia.Name()))
+				writer.Flush()
 				trackInfoFetchers <- currentMedia
 			}
 		case <-time.After(time.Second):
@@ -218,6 +220,7 @@ func pollForMetadataUpdates(writer io.Writer, trackInfoFetchers <-chan models.In
 		endsAt := currentSong.StartedAt.Add(time.Second * time.Duration(currentSong.Duration))
 		left := time.Until(endsAt)
 
+		msg.WriteString(trackFetcher.Name() + "\n")
 		msg.WriteString(currentSong.Title)
 
 		if currentSong.Artist != "" {

@@ -11,7 +11,7 @@ const resortInfoURL = "https://c7.radioboss.fm/w/nowplayinginfo?u=208&nl=1&_=160
 // Resort streams the resort TV music channel from DPark Radio
 type Resort struct{}
 
-// Name is the userpresentable name of the stream
+// Name is the user presentable name of the stream
 func (b Resort) Name() string {
 	return resortName
 }

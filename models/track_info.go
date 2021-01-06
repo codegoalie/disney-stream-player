@@ -11,6 +11,7 @@ type TrackInfo struct {
 }
 
 type InfoFetcher interface {
+	Name() string
 	InfoURL() string
 	ParseTrackInfo([]byte) (*TrackInfo, error)
 }
