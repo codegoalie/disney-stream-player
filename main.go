@@ -21,11 +21,13 @@ import (
 )
 
 var medias = []models.MediaSource{
-	// sorcer.Seasons{},
 	// dpark.Christmas{},
-	sorcer.Atmospheres{},
 	dpark.Background{},
+	sorcer.Atmospheres{},
+	sorcer.SpaDay{},
+	sorcer.Seasons{},
 	dpark.Resort{},
+	sorcer.Main{},
 	wdwnt.Tunes{},
 }
 
