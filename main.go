@@ -189,6 +189,7 @@ func pollForMetadataUpdates(writer io.Writer, trackInfoFetchers <-chan models.In
 			if err != nil {
 				fmt.Fprintln(writer, "Error: "+err.Error())
 				close(quit)
+				return
 			}
 
 			if len(buf.Bytes()) == 0 {
@@ -205,6 +206,7 @@ func pollForMetadataUpdates(writer io.Writer, trackInfoFetchers <-chan models.In
 			if err != nil {
 				fmt.Fprintln(writer, "Error: "+err.Error())
 				close(quit)
+				return
 			}
 		}
 
