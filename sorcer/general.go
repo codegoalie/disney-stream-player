@@ -94,3 +94,58 @@ func parseTrackInfo(raw []byte) (*models.TrackInfo, error) {
 
 	return info, nil
 }
+
+func parseLive365TrackInfo(raw []byte) (*models.TrackInfo, error) {
+	resp := live365Response{}
+	err := json.Unmarshal(raw, &resp)
+	if err != nil {
+		err = fmt.Errorf(
+			"failed to unmarshal sorcer radio history: %w (%s)",
+			err,
+			string(raw),
+		)
+		return nil, err
+	}
+
+	track := resp.CurrentTrack
+	info := models.TrackInfo{
+		Title:     track.Title,
+		Artist:    track.Artist,
+		Duration:  track.Duration,
+		StartedAt: time.Time(track.StartedAt),
+	}
+
+	return &info, nil
+
+}
+
+type live365Response struct {
+	CurrentTrack live365Song `json:"current-track"`
+}
+
+type live365Song struct {
+	Title     string      `json:"title"`
+	Artist    string      `json:"artist"`
+	Duration  float64     `json:"duration"`
+	StartedAt live365Time `json:"start"`
+
+	Art        string      `json:"art"`
+	EndedAt    live365Time `json:"end"`
+	SyncOffset string      `json:"sync_offset"`
+}
+
+type live365Time time.Time
+
+func (t *live365Time) UnmarshalJSON(b []byte) error {
+	conv := strings.Replace(string(b), " ", "T", 1)
+	conv = strings.Trim(conv, `"`)
+	parsed, err := time.Parse(time.RFC3339Nano, conv)
+
+	if err != nil {
+		err = fmt.Errorf("failed to parse live365Time: %w", err)
+		return err
+	}
+
+	*t = live365Time(parsed)
+	return nil
+}

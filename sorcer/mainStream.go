@@ -9,13 +9,13 @@ func (m Main) Name() string {
 }
 
 func (m Main) StreamURL() string {
-	return "https://usa15.fastcast4u.com/proxy/wayarena?mp=/1"
+	return "https://streaming.live365.com/a89268"
 }
 
 func (m Main) InfoURL() string {
-	return infoURL("67046", "4e2d422c81d81eff066a193572925fa52962dd32")
+	return "https://api.live365.com/station/a89268"
 }
 
 func (m Main) ParseTrackInfo(raw []byte) (*models.TrackInfo, error) {
-	return parseTrackInfo(raw)
+	return parseLive365TrackInfo(raw)
 }
