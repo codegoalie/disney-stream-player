@@ -4,7 +4,7 @@ import (
 	"github.com/codegoalie/stream-player/models"
 )
 
-const atmospheresName = "Sorcer Radio Atmospheres"
+const atmospheresName = "Sorcer Radio Mocha"
 const atmospheresStreamURL = "https://samcloud.spacial.com/api/listen?sid=100903&m=sc&rid=177361"
 
 type Atmospheres struct{}
