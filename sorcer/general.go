@@ -134,7 +134,7 @@ type live365Song struct {
 
 	Art        string      `json:"art"`
 	EndedAt    live365Time `json:"end"`
-	SyncOffset string      `json:"sync_offset"`
+	SyncOffset json.Number `json:"sync_offset"`
 }
 
 type live365Time time.Time
