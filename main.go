@@ -54,7 +54,7 @@ func main() {
 
 	currentMedia = medias[currentMediaIndex]
 	mediaURLs <- currentMedia.StreamURL()
-	fmt.Fprintf(writer, fmt.Sprintf("Loading %s...", currentMedia.Name()))
+	fmt.Fprintf(writer, "Loading %s...", currentMedia.Name())
 	writer.Flush()
 	trackInfoFetchers <- currentMedia
 	for {
@@ -65,7 +65,7 @@ func main() {
 				currentMediaIndex = (currentMediaIndex + 1) % len(medias)
 				currentMedia = medias[currentMediaIndex]
 				mediaURLs <- currentMedia.StreamURL()
-				fmt.Fprintf(writer, fmt.Sprintf("Loading %s...", currentMedia.Name()))
+				fmt.Fprintf(writer, "Loading %s...", currentMedia.Name())
 				writer.Flush()
 				trackInfoFetchers <- currentMedia
 			}
@@ -147,8 +147,9 @@ func playAudio(nextMediaURL <-chan string, quit chan struct{}) {
 	defer manager.Detach(eventID)
 
 	var media *vlc.Media
-	for {
 
+play:
+	for {
 		select {
 		case currentMediaURL := <-nextMediaURL:
 			if media != nil {
@@ -166,7 +167,7 @@ func playAudio(nextMediaURL <-chan string, quit chan struct{}) {
 			}
 		case <-quit:
 			media.Release()
-			break
+			break play
 		}
 	}
 }
@@ -195,7 +196,7 @@ func pollForMetadataUpdates(writer io.Writer, trackInfoFetchers <-chan models.In
 			if len(buf.Bytes()) == 0 {
 				fmt.Fprintf(writer, "Metadata fetch error")
 				time.AfterFunc(time.Second, func() {
-					fmt.Fprintf(writer, msg.String())
+					fmt.Fprint(writer, msg.String())
 				})
 				continue
 			}
@@ -250,7 +251,7 @@ func pollForMetadataUpdates(writer io.Writer, trackInfoFetchers <-chan models.In
 
 		msg.WriteString("\n")
 
-		fmt.Fprintf(writer, msg.String())
+		fmt.Fprint(writer, msg.String())
 		msg = strings.Builder{}
 
 		if oldTitle != currentSong.Title {
