@@ -1,6 +1,7 @@
 package sorcer
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/url"
@@ -99,10 +100,12 @@ func parseLive365TrackInfo(raw []byte) (*models.TrackInfo, error) {
 	resp := live365Response{}
 	err := json.Unmarshal(raw, &resp)
 	if err != nil {
+		var printable bytes.Buffer
+		json.Indent(&printable, raw, "", "  ")
 		err = fmt.Errorf(
-			"failed to unmarshal sorcer radio history: %w (%s)",
+			"failed to unmarshal sorcer radio history: %w\n%s",
 			err,
-			string(raw),
+			printable.String(),
 		)
 		return nil, err
 	}
