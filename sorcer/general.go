@@ -132,9 +132,9 @@ type live365Song struct {
 	Duration  float64     `json:"duration"`
 	StartedAt live365Time `json:"start"`
 
-	Art        string      `json:"art"`
-	EndedAt    live365Time `json:"end"`
-	SyncOffset json.Number `json:"sync_offset"`
+	Art     string      `json:"art"`
+	EndedAt live365Time `json:"end"`
+	// SyncOffset string      `json:"sync_offset"`
 }
 
 type live365Time time.Time
