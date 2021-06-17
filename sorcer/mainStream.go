@@ -5,7 +5,7 @@ import "github.com/codegoalie/stream-player/models"
 type Main struct{}
 
 func (m Main) Name() string {
-	return "Sorcer Radio - Main Stream"
+	return "Main Stream (Sorcer Radio)"
 }
 
 func (m Main) StreamURL() string {

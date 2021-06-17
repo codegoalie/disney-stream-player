@@ -4,7 +4,7 @@ import (
 	"github.com/codegoalie/stream-player/models"
 )
 
-const resortName = "DPark Radio Resort"
+const resortName = "Resort TV (DPark Radio)"
 const resortStreamURL = "https://str2b.openstream.co/1474?aw_0_1st.collectionid=4661&stationId=4661&publisherId=1498&k=1605627460"
 const resortInfoURL = "https://c7.radioboss.fm/w/nowplayinginfo?u=208&nl=1&_=1605627484420"
 

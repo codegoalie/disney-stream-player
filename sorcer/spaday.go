@@ -4,7 +4,7 @@ import (
 	"github.com/codegoalie/stream-player/models"
 )
 
-const streamName = "Spa Day"
+const streamName = "Spa Day (Sorcer Radio)"
 const spaStreamURL = "https://streaming.live365.com/a88328"
 const spaHistoryURL = "https://api.live365.com/station/a88328"
 

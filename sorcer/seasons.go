@@ -4,7 +4,7 @@ import (
 	"github.com/codegoalie/stream-player/models"
 )
 
-const seasonsName = "Sorcer Radio Seasons"
+const seasonsName = "Seasons (Sorcer Radio )"
 const seasonsStreamURL = "http://19293.live.streamtheworld.com/SP_R2809833"
 
 type Seasons struct{}

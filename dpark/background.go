@@ -4,7 +4,7 @@ import (
 	"github.com/codegoalie/stream-player/models"
 )
 
-const backgroundName = "DPark Radio Background"
+const backgroundName = "Background (DPark Radio)"
 const backgroundStreamURL = "https://str2b.openstream.co/578?aw_0_1st.collectionid=3127&aw_0_1st.publisherId=602"
 const backgroundInfoURL = "https://c5.radioboss.fm/api/info/38"
 
