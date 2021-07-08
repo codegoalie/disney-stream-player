@@ -189,14 +189,13 @@ func pollForMetadataUpdates(writer io.Writer, trackInfoFetchers <-chan models.In
 			buf, err := utils.HTTPGet(trackFetcher.InfoURL())
 			if err != nil {
 				fmt.Fprintln(writer, "Error: "+err.Error())
-				close(quit)
-				return
+				continue
 			}
 
 			if len(buf.Bytes()) == 0 {
 				fmt.Fprintf(writer, "Metadata fetch error")
 				time.AfterFunc(time.Second, func() {
-					fmt.Fprint(writer, msg.String())
+					fmt.Fprintln(writer, msg.String())
 				})
 				continue
 			}
