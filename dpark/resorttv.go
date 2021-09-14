@@ -5,7 +5,7 @@ import (
 )
 
 const resortName = "Resort TV (DPark Radio)"
-const resortStreamURL = "https://str2b.openstream.co/1474?aw_0_1st.collectionid=4661&stationId=4661&publisherId=1498&k=1605627460"
+const resortStreamURL = "https://cheetah.streemlion.com/Channel4?1631622328219"
 const resortInfoURL = "https://c7.radioboss.fm/w/nowplayinginfo?u=208&nl=1&_=1605627484420"
 
 // Resort streams the resort TV music channel from DPark Radio
