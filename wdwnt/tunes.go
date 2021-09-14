@@ -42,7 +42,7 @@ func (t Tunes) ParseTrackInfo(raw []byte) (*models.TrackInfo, error) {
 	startedAt, err := time.Parse("2006-01-02 15:04:05-07:00", resp.CurrentTrack.Start)
 	if err != nil {
 		err = fmt.Errorf("failed to parse WDWNTunes started at info: %w", err)
-		return nil, err
+		startedAt = time.Time{}
 	}
 
 	info.Title = resp.CurrentTrack.Title
