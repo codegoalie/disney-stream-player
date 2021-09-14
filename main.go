@@ -21,18 +21,19 @@ import (
 )
 
 var medias = []models.MediaSource{
-	// dpark.Christmas{},
-	dpark.Background{},
 	sorcer.Atmospheres{},
-	sorcer.SpaDay{},
+	sorcer.Mocha{},
+	dpark.Background{},
+	dpark.Christmas{},
 	sorcer.Seasons{},
-	dpark.Resort{},
-	sorcer.Main{},
 	wdwnt.Tunes{},
+	sorcer.Main{},
+	dpark.Resort{},
+	sorcer.SpaDay{},
 }
 
 func main() {
-	var currentMediaIndex int
+	var currentMediaIndex int = 4
 	flag.IntVar(&currentMediaIndex, "s", 0, "index of stream to start on")
 	flag.Parse()
 
