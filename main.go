@@ -205,8 +205,7 @@ func pollForMetadataUpdates(writer io.Writer, trackInfoFetchers <-chan models.In
 			currentSong, err = trackFetcher.ParseTrackInfo(buf.Bytes())
 			if err != nil {
 				fmt.Fprintln(writer, "Error: "+err.Error())
-				close(quit)
-				return
+				continue
 			}
 		}
 
