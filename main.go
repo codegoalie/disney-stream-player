@@ -22,14 +22,14 @@ import (
 
 var medias = []models.MediaSource{
 	sorcer.Atmospheres{},
-	sorcer.Mocha{},
 	dpark.Background{},
 	dpark.Christmas{},
 	sorcer.Seasons{},
+	sorcer.Mocha{},
 	wdwnt.Tunes{},
 	sorcer.Main{},
-	dpark.Resort{},
 	sorcer.SpaDay{},
+	dpark.Resort{},
 }
 
 func main() {
