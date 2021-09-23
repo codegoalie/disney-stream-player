@@ -5,7 +5,7 @@ import (
 )
 
 const christmasName = "Christmas (DPark Radio)"
-const christmasStreamURL = "https://listen.openstream.co/4287/;?1631622236639"
+const christmasStreamURL = "https://listen.openstream.co/4287/;?1631785016772"
 const christmasInfoURL = "https://c11.radioboss.fm/w/nowplayinginfo?u=39"
 
 // Christmas streams the christmas music channel from DPark Radio
