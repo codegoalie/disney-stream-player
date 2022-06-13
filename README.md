@@ -1,3 +1,7 @@
+# Note: This repo is no longer maintained. Please see its continuation at https://github.com/lineleader/radio/
+
+----------
+
 # Disney Stream Player
 
 Streams Disney music from known internet radio stations from the command line.
